@@ -13,7 +13,8 @@ local Library = {
         TabSelected = Color3.fromRGB(255, 255, 255),
         TabUnselected = Color3.fromRGB(40, 40, 40),
         TabSelectedText = Color3.fromRGB(0, 0, 0),
-        TabUnselectedText = Color3.fromRGB(255, 255, 255)
+        TabUnselectedText = Color3.fromRGB(255, 255, 255),
+        OptionSelected = Color3.fromRGB(200, 200, 200)
     }
 }
 
@@ -54,7 +55,7 @@ function Library.Main(Name)
         Position = UDim2.new(0.5, -275, 0.5, -175),
         Size = UDim2.new(0, 550, 0, 350),
         Active = true,
-        Draggable = false,
+        Draggable = true,
         Visible = true,
         ZIndex = 3
     })
@@ -74,7 +75,7 @@ function Library.Main(Name)
         Font = Enum.Font[Library.Theme.Font],
         Text = Name,
         TextColor3 = Library.Theme.FontColor,
-        TextSize = 20,
+        TextSize = 18,
         TextXAlignment = Enum.TextXAlignment.Left,
         ZIndex = 4
     })
@@ -85,7 +86,7 @@ function Library.Main(Name)
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         Position = UDim2.new(0, 0, 0, 40),
-        Size = UDim2.new(0, 150, 1, -40),
+        Size = UDim2.new(0, 130, 1, -40),
         ZIndex = 4
     })
 
@@ -118,43 +119,10 @@ function Library.Main(Name)
         Name = "ContainerFrame",
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, 150, 0, 40),
-        Size = UDim2.new(1, -160, 1, -50),
+        Position = UDim2.new(0, 130, 0, 40),
+        Size = UDim2.new(1, -140, 1, -50),
         ZIndex = 3
     })
-
-    local isDraggingUI = false
-    local dragStartPos = nil
-    local dragStartFramePos = nil
-
-    TabFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch then
-            isDraggingUI = true
-            dragStartPos = input.Position
-            dragStartFramePos = MainFrame.Position
-        end
-    end)
-
-    TabFrame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch and isDraggingUI then
-            local delta = input.Position - dragStartPos
-            local newPos = UDim2.new(
-                dragStartFramePos.X.Scale,
-                dragStartFramePos.X.Offset + delta.X,
-                dragStartFramePos.Y.Scale,
-                dragStartFramePos.Y.Offset + delta.Y
-            )
-            MainFrame.Position = newPos
-        end
-    end)
-
-    TabFrame.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch then
-            isDraggingUI = false
-            dragStartPos = nil
-            dragStartFramePos = nil
-        end
-    end)
 
     InputService.InputBegan:Connect(function(input, IsTyping)
         if input.KeyCode == Enum.KeyCode[Library.Theme.HideKey] and not IsTyping then
@@ -173,7 +141,7 @@ function Library.Main(Name)
             Name = TabName,
             BackgroundColor3 = Library.Theme.TabUnselected,
             BorderSizePixel = 0,
-            Size = UDim2.new(1, -10, 0, 40),
+            Size = UDim2.new(1, -10, 0, 35),
             Font = Enum.Font[Library.Theme.Font],
             Text = TabName,
             TextColor3 = Library.Theme.TabUnselectedText,
@@ -252,7 +220,7 @@ function Library.Main(Name)
                 Name = config.Name,
                 BackgroundColor3 = Library.Theme.Element,
                 BorderSizePixel = 0,
-                Size = UDim2.new(1, -10, 0, 40),
+                Size = UDim2.new(1, -10, 0, 35),
                 ZIndex = 3
             })
 
@@ -339,7 +307,7 @@ function Library.Main(Name)
                 Name = config.Name,
                 BackgroundColor3 = Library.Theme.Element,
                 BorderSizePixel = 0,
-                Size = UDim2.new(1, -10, 0, 50),
+                Size = UDim2.new(1, -10, 0, 45),
                 ZIndex = 3
             })
 
@@ -478,7 +446,7 @@ function Library.Main(Name)
                 Name = config.Name,
                 BackgroundColor3 = Library.Theme.Element,
                 BorderSizePixel = 0,
-                Size = UDim2.new(1, -10, 0, 40),
+                Size = UDim2.new(1, -10, 0, 35),
                 ZIndex = 3
             })
 
@@ -567,7 +535,7 @@ function Library.Main(Name)
             local function UpdateDropdownSize()
                 local itemHeight = 30
                 local maxHeight = math.min(#Options * itemHeight + 5, 150)
-                local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
                 if IsOpen then
                     TweenService:Create(OptionFrame, tweenInfo, {Size = UDim2.new(1, 0, 0, maxHeight)}):Play()
                     TweenService:Create(Arrow, tweenInfo, {Rotation = 180}):Play()
@@ -592,7 +560,7 @@ function Library.Main(Name)
                         Size = UDim2.new(1, -5, 0, 30),
                         Font = Enum.Font[Library.Theme.Font],
                         Text = tostring(option),
-                        TextColor3 = Library.Theme.FontColor,
+                        TextColor3 = option == Selected and Library.Theme.OptionSelected or Library.Theme.FontColor,
                         TextSize = 16,
                         TextXAlignment = Enum.TextXAlignment.Left,
                         ZIndex = 5
@@ -602,9 +570,11 @@ function Library.Main(Name)
                         if input.UserInputType == Enum.UserInputType.Touch then
                             Selected = option
                             SelectedLabel.Text = tostring(option)
-                            IsOpen = false
-                            OptionFrame.Visible = false
-                            UpdateDropdownSize()
+                            for _, btn in pairs(OptionFrame:GetChildren()) do
+                                if btn:IsA("TextButton") then
+                                    btn.TextColor3 = btn.Text == tostring(option) and Library.Theme.OptionSelected or Library.Theme.FontColor
+                                end
+                            end
                             spawn(function() config.Callback(option) end)
                         end
                     end)
@@ -619,6 +589,14 @@ function Library.Main(Name)
                 if input.UserInputType == Enum.UserInputType.Touch then
                     IsOpen = not IsOpen
                     OptionFrame.Visible = IsOpen
+                    UpdateDropdownSize()
+                end
+            end)
+
+            MainFrame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Touch and IsOpen and input.Position.X < Dropdown.AbsolutePosition.X or input.Position.X > Dropdown.AbsolutePosition.X + Dropdown.AbsoluteSize.X or input.Position.Y < Dropdown.AbsolutePosition.Y or input.Position.Y > Dropdown.AbsolutePosition.Y + Dropdown.AbsoluteSize.Y + (OptionFrame.Visible and OptionFrame.AbsoluteSize.Y or 0) then
+                    IsOpen = false
+                    OptionFrame.Visible = false
                     UpdateDropdownSize()
                 end
             end)
