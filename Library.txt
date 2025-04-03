@@ -1,634 +1,304 @@
 local TweenService = game:GetService("TweenService")
 local InputService = game:GetService("UserInputService")
 
-local Library = {
+local Linux = {
     Theme = {
-        Font = "Montserrat",
-        Accent = Color3.fromRGB(70, 100, 255),
-        Background = Color3.fromRGB(33, 33, 33),
-        Element = Color3.fromRGB(70, 70, 70),
-        ToggleOff = Color3.fromRGB(50, 50, 50),
-        FontColor = Color3.fromRGB(255, 255, 255),
-        HideKey = "LeftAlt",
-        TabSelected = Color3.fromRGB(255, 255, 255),
-        TabUnselected = Color3.fromRGB(40, 40, 40),
-        TabSelectedText = Color3.fromRGB(0, 0, 0),
-        TabUnselectedText = Color3.fromRGB(255, 255, 255),
-        TitleBarLine = Color3.fromRGB(75, 75, 75)
+        Background = Color3.fromRGB(24, 24, 24),
+        Element = Color3.fromRGB(28, 28, 28),
+        Accent = Color3.fromRGB(80, 120, 255),
+        Text = Color3.fromRGB(220, 220, 220),
+        Toggle = Color3.fromRGB(40, 40, 40),
+        TabActive = Color3.fromRGB(80, 120, 255),
+        TabInactive = Color3.fromRGB(28, 28, 28)
     }
 }
 
-local CreateModule = {
-    reg = {}
-}
-
-local function AddToReg(Instance)
-    table.insert(CreateModule.reg, Instance)
-end
-
-function CreateModule.Instance(instance, properties)
-    local CreatedInstance = Instance.new(instance)
-    for property, value in pairs(properties) do
-        CreatedInstance[property] = value
+function Linux.Instance(class, props)
+    local inst = Instance.new(class)
+    for k, v in pairs(props) do
+        inst[k] = v
     end
-    return CreatedInstance
+    return inst
 end
 
-function Library.Main(Name)
+function Linux.Create(Name)
     for _, v in pairs(game.CoreGui:GetChildren()) do
-        if v.Name == "DarkSquareLib" then
+        if v.Name == "LinuxUI" then
             v:Destroy()
         end
     end
 
-    local DarkSquareLib = CreateModule.Instance("ScreenGui", {
-        Name = "DarkSquareLib",
+    local LinuxUI = Linux.Instance("ScreenGui", {
+        Name = "LinuxUI",
         Parent = game.CoreGui,
         ResetOnSpawn = false
     })
 
-    local MainFrame = CreateModule.Instance("Frame", {
-        Name = "MainFrame",
-        Parent = DarkSquareLib,
-        BackgroundColor3 = Library.Theme.Background,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0.5, -275, 0.5, -175),
-        Size = UDim2.new(0, 550, 0, 350),
+    local Main = Linux.Instance("Frame", {
+        Parent = LinuxUI,
+        BackgroundColor3 = Linux.Theme.Background,
+        Size = UDim2.new(0, 500, 0, 350),
+        Position = UDim2.new(0.5, -250, 0.5, -175),
         Active = true,
         Draggable = true,
-        Visible = true,
-        ZIndex = 3
+        ZIndex = 1
     })
 
-    CreateModule.Instance("UICorner", {
-        Parent = MainFrame,
-        CornerRadius = UDim.new(0, 8)
+    Linux.Instance("UICorner", {
+        Parent = Main,
+        CornerRadius = UDim.new(0, 5)
     })
 
-    local TitleLabel = CreateModule.Instance("TextLabel", {
-        Parent = MainFrame,
-        Name = "TitleLabel",
+    local TopBar = Linux.Instance("Frame", {
+        Parent = Main,
+        BackgroundColor3 = Linux.Theme.Element,
+        Size = UDim2.new(1, 0, 0, 25),
+        ZIndex = 2
+    })
+
+    Linux.Instance("UICorner", {
+        Parent = TopBar,
+        CornerRadius = UDim.new(0, 5)
+    })
+
+    local Title = Linux.Instance("TextLabel", {
+        Parent = TopBar,
         BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 10, 0, 5),
-        Size = UDim2.new(1, -20, 0, 30),
-        Font = Enum.Font[Library.Theme.Font],
+        Size = UDim2.new(1, -10, 1, 0),
+        Position = UDim2.new(0, 5, 0, 0),
+        Font = Enum.Font.SourceSansBold,
         Text = Name,
-        TextColor3 = Library.Theme.FontColor,
-        TextSize = 18,
+        TextColor3 = Linux.Theme.Text,
+        TextSize = 16,
         TextXAlignment = Enum.TextXAlignment.Left,
-        ZIndex = 4
+        ZIndex = 2
     })
 
-    local TitleBarLine = CreateModule.Instance("Frame", {
-        Parent = MainFrame,
-        Name = "TitleBarLine",
-        BackgroundColor3 = Library.Theme.TitleBarLine,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 0, 35),
-        Size = UDim2.new(1, 0, 0, 1),
-        ZIndex = 4
-    })
-
-    local TabFrame = CreateModule.Instance("Frame", {
-        Parent = MainFrame,
-        Name = "TabFrame",
+    local TabsBar = Linux.Instance("Frame", {
+        Parent = Main,
         BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 0, 40),
-        Size = UDim2.new(0, 130, 1, -40),
-        ZIndex = 4
+        Position = UDim2.new(0, 0, 0, 25),
+        Size = UDim2.new(0, 110, 1, -25),
+        ZIndex = 2
     })
 
-    local TabContainer = CreateModule.Instance("Frame", {
-        Parent = TabFrame,
-        Name = "TabContainer",
+    local TabHolder = Linux.Instance("Frame", {
+        Parent = TabsBar,
         BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 0, 0, 0),
         Size = UDim2.new(1, 0, 1, 0),
-        ZIndex = 4
+        ZIndex = 2
     })
 
-    local TabList = CreateModule.Instance("UIListLayout", {
-        Parent = TabContainer,
-        FillDirection = Enum.FillDirection.Vertical,
+    local TabLayout = Linux.Instance("UIListLayout", {
+        Parent = TabHolder,
+        Padding = UDim.new(0, 3),
         HorizontalAlignment = Enum.HorizontalAlignment.Left,
-        VerticalAlignment = Enum.VerticalAlignment.Top,
-        Padding = UDim.new(0, 4)
+        VerticalAlignment = Enum.VerticalAlignment.Top
     })
 
-    local TabPadding = CreateModule.Instance("UIPadding", {
-        Parent = TabContainer,
-        PaddingLeft = UDim.new(0, 10),
-        PaddingTop = UDim.new(0, 4)
+    local TabPadding = Linux.Instance("UIPadding", {
+        Parent = TabHolder,
+        PaddingLeft = UDim.new(0, 5),
+        PaddingTop = UDim.new(0, 5)
     })
 
-    local ContainerFrame = CreateModule.Instance("Frame", {
-        Parent = MainFrame,
-        Name = "ContainerFrame",
+    local Content = Linux.Instance("Frame", {
+        Parent = Main,
         BackgroundTransparency = 1,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0, 130, 0, 40),
-        Size = UDim2.new(1, -140, 1, -50),
-        ZIndex = 3
+        Position = UDim2.new(0, 110, 0, 25),
+        Size = UDim2.new(1, -110, 1, -25),
+        ZIndex = 1
     })
 
-    InputService.InputBegan:Connect(function(input, IsTyping)
-        if input.KeyCode == Enum.KeyCode[Library.Theme.HideKey] and not IsTyping then
-            MainFrame.Visible = not MainFrame.Visible
+    InputService.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.LeftAlt then
+            Main.Visible = not Main.Visible
         end
     end)
 
-    local InMain = {}
+    local LinuxLib = {}
     local Tabs = {}
-    local TabOrder = {}
     local CurrentTab = nil
 
-    local function CreateTab(TabName)
-        local TabButton = CreateModule.Instance("TextButton", {
-            Parent = TabContainer,
-            Name = TabName,
-            BackgroundColor3 = Library.Theme.TabUnselected,
-            BorderSizePixel = 0,
-            Size = UDim2.new(1, -10, 0, 35),
-            Font = Enum.Font[Library.Theme.Font],
-            Text = TabName,
-            TextColor3 = Library.Theme.TabUnselectedText,
+    function LinuxLib.Tab(Name)
+        local TabBtn = Linux.Instance("TextButton", {
+            Parent = TabHolder,
+            BackgroundColor3 = Linux.Theme.TabInactive,
+            Size = UDim2.new(1, -5, 0, 28),
+            Font = Enum.Font.SourceSans,
+            Text = Name,
+            TextColor3 = Linux.Theme.TabInactiveText or Linux.Theme.Text,
             TextSize = 14,
-            AutoButtonColor = false,
-            ZIndex = 4
+            ZIndex = 2
         })
 
-        CreateModule.Instance("UICorner", {
-            Parent = TabButton,
-            CornerRadius = UDim.new(0, 6)
+        Linux.Instance("UICorner", {
+            Parent = TabBtn,
+            CornerRadius = UDim.new(0, 4)
         })
 
-        local TabContent = CreateModule.Instance("ScrollingFrame", {
-            Parent = ContainerFrame,
-            Name = TabName .. "Container",
+        local TabContent = Linux.Instance("ScrollingFrame", {
+            Parent = Content,
             BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            Position = UDim2.new(0, 0, 0, 0),
             Size = UDim2.new(1, 0, 1, 0),
             CanvasSize = UDim2.new(0, 0, 0, 0),
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
             ScrollBarThickness = 0,
-            ScrollingEnabled = true,
             Visible = false,
-            ZIndex = 3
+            ZIndex = 1
         })
 
-        local ElementList = CreateModule.Instance("UIListLayout", {
+        local ContentLayout = Linux.Instance("UIListLayout", {
             Parent = TabContent,
-            Padding = UDim.new(0, 5),
-            HorizontalAlignment = Enum.HorizontalAlignment.Left,
-            SortOrder = Enum.SortOrder.LayoutOrder
+            Padding = UDim.new(0, 4),
+            HorizontalAlignment = Enum.HorizontalAlignment.Left
         })
 
-        local ContainerPadding = CreateModule.Instance("UIPadding", {
+        local ContentPadding = Linux.Instance("UIPadding", {
             Parent = TabContent,
-            PaddingLeft = UDim.new(0, 10),
+            PaddingLeft = UDim.new(0, 5),
             PaddingTop = UDim.new(0, 5)
         })
 
-        TabButton.InputBegan:Connect(function(input)
+        TabBtn.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.Touch then
                 if CurrentTab then
-                    Tabs[CurrentTab].Container.Visible = false
-                    Tabs[CurrentTab].Button.BackgroundColor3 = Library.Theme.TabUnselected
-                    Tabs[CurrentTab].Button.TextColor3 = Library.Theme.TabUnselectedText
+                    Tabs[CurrentTab].Content.Visible = false
+                    Tabs[CurrentTab].Button.BackgroundColor3 = Linux.Theme.TabInactive
+                    Tabs[CurrentTab].Button.TextColor3 = Linux.Theme.TabInactiveText or Linux.Theme.Text
                 end
                 TabContent.Visible = true
-                TabButton.BackgroundColor3 = Library.Theme.TabSelected
-                TabButton.TextColor3 = Library.Theme.TabSelectedText
-                CurrentTab = TabName
+                TabBtn.BackgroundColor3 = Linux.Theme.TabActive
+                TabBtn.TextColor3 = Linux.Theme.Text
+                CurrentTab = Name
             end
         end)
 
-        local TabData = {
-            Button = TabButton,
-            Container = TabContent
+        Tabs[Name] = {
+            Button = TabBtn,
+            Content = TabContent
         }
-
-        Tabs[TabName] = TabData
-        table.insert(TabOrder, TabName)
 
         if not CurrentTab then
             TabContent.Visible = true
-            TabButton.BackgroundColor3 = Library.Theme.TabSelected
-            TabButton.TextColor3 = Library.Theme.TabSelectedText
-            CurrentTab = TabName
+            TabBtn.BackgroundColor3 = Linux.Theme.TabActive
+            TabBtn.TextColor3 = Linux.Theme.Text
+            CurrentTab = Name
         end
 
-        local TabFunctions = {}
+        local TabElements = {}
 
-        function TabFunctions.Checkbox(config)
-            local Checkbox = CreateModule.Instance("Frame", {
-                Parent = TabData.Container,
-                Name = config.Name,
-                BackgroundColor3 = Library.Theme.Element,
-                BorderSizePixel = 0,
-                Size = UDim2.new(1, -10, 0, 35),
-                ZIndex = 3
-            })
-
-            CreateModule.Instance("UICorner", {
-                Parent = Checkbox,
-                CornerRadius = UDim.new(0, 6)
-            })
-
-            local Label = CreateModule.Instance("TextLabel", {
-                Parent = Checkbox,
-                Name = "Label",
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 10, 0, 0),
-                Size = UDim2.new(0.7, 0, 1, 0),
-                Font = Enum.Font[Library.Theme.Font],
+        function TabElements.Button(config)
+            local Btn = Linux.Instance("TextButton", {
+                Parent = TabContent,
+                BackgroundColor3 = Linux.Theme.Element,
+                Size = UDim2.new(1, -5, 0, 30),
+                Font = Enum.Font.SourceSans,
                 Text = config.Name,
-                TextColor3 = Library.Theme.FontColor,
+                TextColor3 = Linux.Theme.Text,
+                TextSize = 14,
+                ZIndex = 1
+            })
+
+            Linux.Instance("UICorner", {
+                Parent = Btn,
+                CornerRadius = UDim.new(0, 4)
+            })
+
+            Btn.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Touch then
+                    TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = Linux.Theme.Accent}):Play()
+                    spawn(function() config.Callback() end)
+                    wait(0.1)
+                    TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = Linux.Theme.Element}):Play()
+                end
+            end)
+
+            return Btn
+        end
+
+        function TabElements.Toggle(config)
+            local Toggle = Linux.Instance("Frame", {
+                Parent = TabContent,
+                BackgroundColor3 = Linux.Theme.Element,
+                Size = UDim2.new(1, -5, 0, 30),
+                ZIndex = 1
+            })
+
+            Linux.Instance("UICorner", {
+                Parent = Toggle,
+                CornerRadius = UDim.new(0, 4)
+            })
+
+            local Label = Linux.Instance("TextLabel", {
+                Parent = Toggle,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(0.8, 0, 1, 0),
+                Position = UDim2.new(0, 5, 0, 0),
+                Font = Enum.Font.SourceSans,
+                Text = config.Name,
+                TextColor3 = Linux.Theme.Text,
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 3
+                ZIndex = 1
             })
 
-            local ToggleFrame = CreateModule.Instance("Frame", {
-                Parent = Checkbox,
-                Name = "ToggleFrame",
-                BackgroundColor3 = Library.Theme.ToggleOff,
-                BorderSizePixel = 0,
-                Position = UDim2.new(1, -50, 0.5, -8),
+            local ToggleBox = Linux.Instance("Frame", {
+                Parent = Toggle,
+                BackgroundColor3 = Linux.Theme.Toggle,
                 Size = UDim2.new(0, 40, 0, 16),
-                ZIndex = 3
+                Position = UDim2.new(1, -45, 0.5, -8),
+                ZIndex = 1
             })
 
-            CreateModule.Instance("UICorner", {
-                Parent = ToggleFrame,
+            Linux.Instance("UICorner", {
+                Parent = ToggleBox,
                 CornerRadius = UDim.new(1, 0)
             })
 
-            local ToggleKnob = CreateModule.Instance("Frame", {
-                Parent = ToggleFrame,
-                Name = "ToggleKnob",
-                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 2, 0, 2),
-                Size = UDim2.new(0, 12, 1, -4),
-                ZIndex = 4
+            local Knob = Linux.Instance("Frame", {
+                Parent = ToggleBox,
+                BackgroundColor3 = Linux.Theme.Text,
+                Size = UDim2.new(0, 12, 1, -2),
+                Position = UDim2.new(0, 1, 0, 1),
+                ZIndex = 1
             })
 
-            CreateModule.Instance("UICorner", {
-                Parent = ToggleKnob,
+            Linux.Instance("UICorner", {
+                Parent = Knob,
                 CornerRadius = UDim.new(1, 0)
             })
 
-            local IsActive = config.Default or false
+            local State = config.Default or false
 
             local function UpdateToggle()
-                local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-                if IsActive then
-                    TweenService:Create(ToggleFrame, tweenInfo, {BackgroundColor3 = Library.Theme.Accent}):Play()
-                    TweenService:Create(ToggleKnob, tweenInfo, {Position = UDim2.new(1, -14, 0, 2)}):Play()
+                local tween = TweenInfo.new(0.2, Enum.EasingStyle.Quad)
+                if State then
+                    TweenService:Create(ToggleBox, tween, {BackgroundColor3 = Linux.Theme.Accent}):Play()
+                    TweenService:Create(Knob, tween, {Position = UDim2.new(1, -13, 0, 1)}):Play()
                 else
-                    TweenService:Create(ToggleFrame, tweenInfo, {BackgroundColor3 = Library.Theme.ToggleOff}):Play()
-                    TweenService:Create(ToggleKnob, tweenInfo, {Position = UDim2.new(0, 2, 0, 2)}):Play()
+                    TweenService:Create(ToggleBox, tween, {BackgroundColor3 = Linux.Theme.Toggle}):Play()
+                    TweenService:Create(Knob, tween, {Position = UDim2.new(0, 1, 0, 1)}):Play()
                 end
             end
 
             UpdateToggle()
 
-            Checkbox.InputBegan:Connect(function(input)
+            Toggle.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.Touch then
-                    IsActive = not IsActive
+                    State = not State
                     UpdateToggle()
-                    spawn(function() config.Callback(IsActive) end)
+                    spawn(function() config.Callback(State) end)
                 end
             end)
 
-            AddToReg(Checkbox)
-            return Checkbox
+            return Toggle
         end
 
-        function TabFunctions.Slider(config)
-            local Slider = CreateModule.Instance("Frame", {
-                Parent = TabData.Container,
-                Name = config.Name,
-                BackgroundColor3 = Library.Theme.Element,
-                BorderSizePixel = 0,
-                Size = UDim2.new(1, -10, 0, 40),
-                ZIndex = 3
-            })
-
-            CreateModule.Instance("UICorner", {
-                Parent = Slider,
-                CornerRadius = UDim.new(0, 6)
-            })
-
-            local Label = CreateModule.Instance("TextLabel", {
-                Parent = Slider,
-                Name = "Label",
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 10, 0, 2),
-                Size = UDim2.new(0.5, 0, 0, 18),
-                Font = Enum.Font[Library.Theme.Font],
-                Text = config.Name,
-                TextColor3 = Library.Theme.FontColor,
-                TextSize = 14,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 3
-            })
-
-            local ValueLabel = CreateModule.Instance("TextLabel", {
-                Parent = Slider,
-                Name = "ValueLabel",
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2.new(0.8, 0, 0, 2),
-                Size = UDim2.new(0.2, -10, 0, 18),
-                Font = Enum.Font[Library.Theme.Font],
-                Text = tostring(config.Default or 0),
-                TextColor3 = Library.Theme.FontColor,
-                TextSize = 14,
-                TextXAlignment = Enum.TextXAlignment.Right,
-                ZIndex = 3
-            })
-
-            local SliderBar = CreateModule.Instance("Frame", {
-                Parent = Slider,
-                Name = "SliderBar",
-                BackgroundColor3 = Color3.fromRGB(90, 90, 90),
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 10, 0, 24),
-                Size = UDim2.new(1, -20, 0, 5),
-                ZIndex = 3
-            })
-
-            CreateModule.Instance("UICorner", {
-                Parent = SliderBar,
-                CornerRadius = UDim.new(1, 0)
-            })
-
-            local SliderFill = CreateModule.Instance("Frame", {
-                Parent = SliderBar,
-                Name = "SliderFill",
-                BackgroundColor3 = Library.Theme.Accent,
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 0, 0, 0),
-                Size = UDim2.new(0, 0, 1, 0),
-                ZIndex = 3
-            })
-
-            CreateModule.Instance("UICorner", {
-                Parent = SliderFill,
-                CornerRadius = UDim.new(1, 0)
-            })
-
-            local SliderKnob = CreateModule.Instance("Frame", {
-                Parent = SliderBar,
-                Name = "SliderKnob",
-                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 0, 0.5, -4),
-                Size = UDim2.new(0, 8, 0, 8),
-                ZIndex = 4
-            })
-
-            CreateModule.Instance("UICorner", {
-                Parent = SliderKnob,
-                CornerRadius = UDim.new(1, 0)
-            })
-
-            local CurrentValue = config.Default or 0
-            local MinValue = config.Min or 0
-            local MaxValue = config.Max or 100
-
-            local function UpdateSlider()
-                local percentage = (CurrentValue - MinValue) / (MaxValue - MinValue)
-                percentage = math.clamp(percentage, 0, 1)
-                SliderFill.Size = UDim2.new(percentage, 0, 1, 0)
-                SliderKnob.Position = UDim2.new(percentage, -4, 0.5, -4)
-                ValueLabel.Text = tostring(math.floor(CurrentValue))
-                spawn(function() config.Callback(CurrentValue) end)
-            end
-
-            UpdateSlider()
-
-            local isDraggingSlider = false
-            local lastTouchPos = nil
-
-            SliderBar.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.Touch then
-                    isDraggingSlider = true
-                    lastTouchPos = input.Position.X
-                end
-            })
-
-            SliderBar.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.Touch then
-                    isDraggingSlider = false
-                    lastTouchPos = nil
-                end
-            })
-
-            InputService.InputChanged:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.Touch and isDraggingSlider then
-                    local touchPos = input.Position.X
-                    local sliderPos = SliderBar.AbsolutePosition.X
-                    local sliderSize = SliderBar.AbsoluteSize.X
-                    local relativePos = (touchPos - sliderPos) / sliderSize
-                    relativePos = math.clamp(relativePos, 0, 1)
-                    CurrentValue = MinValue + (relativePos * (MaxValue - MinValue))
-                    UpdateSlider()
-                    lastTouchPos = touchPos
-                end
-            end)
-
-            AddToReg(Slider)
-            return Slider
-        end
-
-        function TabFunctions.Dropdown(config)
-            local Dropdown = CreateModule.Instance("Frame", {
-                Parent = TabData.Container,
-                Name = config.Name,
-                BackgroundColor3 = Library.Theme.Element,
-                BorderSizePixel = 0,
-                Size = UDim2.new(1, -10, 0, 35),
-                ZIndex = 3
-            })
-
-            CreateModule.Instance("UICorner", {
-                Parent = Dropdown,
-                CornerRadius = UDim.new(0, 6)
-            })
-
-            local Label = CreateModule.Instance("TextLabel", {
-                Parent = Dropdown,
-                Name = "Label",
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 10, 0, 0),
-                Size = UDim2.new(0.7, 0, 1, 0),
-                Font = Enum.Font[Library.Theme.Font],
-                Text = config.Name,
-                TextColor3 = Library.Theme.FontColor,
-                TextSize = 14,
-                TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 3
-            })
-
-            local SelectedLabel = CreateModule.Instance("TextLabel", {
-                Parent = Dropdown,
-                Name = "SelectedLabel",
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 0, 0, 0),
-                Size = UDim2.new(1, -40, 1, 0),
-                Font = Enum.Font[Library.Theme.Font],
-                Text = config.Default or (config.Options and config.Options[1]) or "None",
-                TextColor3 = Library.Theme.FontColor,
-                TextSize = 14,
-                TextXAlignment = Enum.TextXAlignment.Right,
-                ZIndex = 3
-            })
-
-            local Arrow = CreateModule.Instance("ImageLabel", {
-                Parent = Dropdown,
-                Name = "Arrow",
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2.new(1, -25, 0.5, -8),
-                Size = UDim2.new(0, 14, 0, 14),
-                Image = "rbxassetid://10709767827",
-                ImageColor3 = Library.Theme.FontColor,
-                ZIndex = 3
-            })
-
-            local OptionFrame = CreateModule.Instance("Frame", {
-                Parent = Dropdown,
-                Name = "OptionFrame",
-                BackgroundColor3 = Library.Theme.Element,
-                BorderSizePixel = 0,
-                Position = UDim2.new(0, 0, 1, 3),
-                Size = UDim2.new(1, 0, 0, 0),
-                ClipsDescendants = true,
-                Visible = false,
-                ZIndex = 5
-            })
-
-            CreateModule.Instance("UICorner", {
-                Parent = OptionFrame,
-                CornerRadius = UDim.new(0, 6)
-            })
-
-            local OptionList = CreateModule.Instance("UIListLayout", {
-                Parent = OptionFrame,
-                FillDirection = Enum.FillDirection.Vertical,
-                HorizontalAlignment = Enum.HorizontalAlignment.Left,
-                VerticalAlignment = Enum.VerticalAlignment.Top,
-                Padding = UDim.new(0, 2)
-            })
-
-            local OptionPadding = CreateModule.Instance("UIPadding", {
-                Parent = OptionFrame,
-                PaddingLeft = UDim.new(0, 5),
-                PaddingTop = UDim.new(0, 5)
-            })
-
-            local Options = config.Options or {}
-            local Selected = config.Default or (Options[1] or "None")
-            local IsOpen = false
-
-            local function UpdateDropdownSize()
-                local itemHeight = 25
-                local maxHeight = math.min(#Options * itemHeight + 5, 150)
-                local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-                if IsOpen then
-                    TweenService:Create(OptionFrame, tweenInfo, {Size = UDim2.new(1, 0, 0, maxHeight)}):Play()
-                    TweenService:Create(Arrow, tweenInfo, {Rotation = 180}):Play()
-                else
-                    TweenService:Create(OptionFrame, tweenInfo, {Size = UDim2.new(1, 0, 0, 0)}):Play()
-                    TweenService:Create(Arrow, tweenInfo, {Rotation = 0}):Play()
-                end
-            end
-
-            local function PopulateOptions()
-                for _, child in pairs(OptionFrame:GetChildren()) do
-                    if child:IsA("TextButton") then
-                        child:Destroy()
-                    end
-                end
-                for i, option in pairs(Options) do
-                    local OptionButton = CreateModule.Instance("TextButton", {
-                        Parent = OptionFrame,
-                        Name = "Option" .. i,
-                        BackgroundTransparency = 1,
-                        BorderSizePixel = 0,
-                        Size = UDim2.new(1, -5, 0, 25),
-                        Font = Enum.Font[Library.Theme.Font],
-                        Text = tostring(option),
-                        TextColor3 = Library.Theme.FontColor,
-                        TextSize = 14,
-                        TextXAlignment = Enum.TextXAlignment.Left,
-                        ZIndex = 5
-                    })
-
-                    OptionButton.InputBegan:Connect(function(input)
-                        if input.UserInputType == Enum.UserInputType.Touch then
-                            Selected = option
-                            SelectedLabel.Text = tostring(option)
-                            IsOpen = false
-                            OptionFrame.Visible = false
-                            UpdateDropdownSize()
-                            spawn(function() config.Callback(option) end)
-                        end
-                    end)
-                end
-            end
-
-            if #Options > 0 then
-                PopulateOptions()
-            end
-
-            Dropdown.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.Touch then
-                    IsOpen = not IsOpen
-                    OptionFrame.Visible = IsOpen
-                    UpdateDropdownSize()
-                end
-            end)
-
-            local function UpdateOptions(newOptions)
-                Options = newOptions or {}
-                Selected = config.Default or (Options[1] or "None")
-                SelectedLabel.Text = tostring(Selected)
-                PopulateOptions()
-                if IsOpen then
-                    IsOpen = false
-                    OptionFrame.Visible = false
-                    UpdateDropdownSize()
-                end
-            end
-
-            AddToReg(Dropdown)
-            return {
-                Instance = Dropdown,
-                SetOptions = UpdateOptions,
-                GetSelected = function() return Selected end
-            }
-        end
-
-        return TabFunctions
+        return TabElements
     end
 
-    function InMain.Tab(TabName)
-        return CreateTab(TabName)
-    end
-
-    return InMain
+    return LinuxLib
 end
 
-return Library
+return Linux
